@@ -361,15 +361,15 @@
         <!-- Stats -->
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-value" id="hive-total">0</div>
+                <div class="stat-value" id="hive-total">5</div>
                 <div class="stat-label">HIVE NODES</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="cpu-load">26%</div>
+                <div class="stat-value" id="cpu-load">1%</div>
                 <div class="stat-label">CPU LOAD</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="memory-usage">50.8%</div>
+                <div class="stat-value" id="memory-usage">54.4%</div>
                 <div class="stat-label">MEMORY USAGE</div>
             </div>
             <div class="stat-card">
@@ -527,7 +527,7 @@
             { time: '14:06:02', level: 'info', message: 'Quantum encryption enabled' },
             { time: '14:06:18', level: 'info', message: 'Memory allocation optimized' },
             { time: '14:06:35', level: 'info', message: 'Network throughput stabilized at 1.2 MB/s' },
-            { time: '14:06:52', level: 'info', message: 'CPU load balanced across 0 nodes' }
+            { time: '14:06:52', level: 'info', message: 'CPU load balanced across 5 nodes' }
         ];
         
         let logIndex = 0;
@@ -541,7 +541,7 @@
                     <span class="log-time">[${entry.time}]</span>
                     <span class="log-level-${entry.level}">${entry.level.toUpperCase()}</span>:
                     ${entry.message.replace('1.2', document.getElementById('network-throughput').textContent)
-                                    .replace('0', document.getElementById('hive-total').textContent)}
+                                    .replace('5', document.getElementById('hive-total').textContent)}
                 `;
                 logStream.appendChild(logElement);
                 logStream.scrollTop = logStream.scrollHeight;
