@@ -204,7 +204,7 @@
                     <div class="stat-label">HIVE NODES</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="network-throughput">1.6</div>
+                    <div class="stat-value" id="network-throughput">4.0</div>
                     <div class="stat-label">NETWORK MB/s</div>
                 </div>
                 <div class="stat-card">
@@ -243,14 +243,14 @@
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">CPU<br><span id="cpu-val">67%</span></div>
+                        <div class="chart-label">CPU<br><span id="cpu-val">10%</span></div>
                     </div>
                     <div class="chart-wrap">
                         <svg class="chart-svg" viewBox="0 0 100 100">
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">RAM<br><span id="ram-val">54.7%</span></div>
+                        <div class="chart-label">RAM<br><span id="ram-val">54.9%</span></div>
                     </div>
                 </div>
                 <canvas id="wave-canvas"></canvas>
@@ -531,8 +531,8 @@
         });
 
         // --- CHARTS & BOOT ---
-        const cpuVal = parseInt("67") || 0;
-        const ramVal = parseInt("54.7") || 0;
+        const cpuVal = parseInt("10") || 0;
+        const ramVal = parseInt("54.9") || 0;
         document.getElementById('cpu-ring').style.strokeDashoffset = 251 - (251 * cpuVal / 100);
         document.getElementById('ram-ring').style.strokeDashoffset = 251 - (251 * ramVal / 100);
 
@@ -545,7 +545,7 @@
         });
         
         // Log Injection
-        const logEntries = [{"time": "20:07:27", "level": "info", "message": "\ufeffalive"}];
+        const logEntries = [{"time": "20:18:52", "level": "info", "message": "\ufeffalive"}];
         let logIndex = 0;
         function addLog() {
             if (logIndex < logEntries.length) {
