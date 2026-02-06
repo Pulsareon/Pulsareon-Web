@@ -28,6 +28,20 @@
             --scanline-color: rgba(0, 0, 0, 0.5);
         }
 
+        /* THEMES */
+        [data-theme="crimson"] {
+            --bg-color: #0f0505;
+            --primary-color: #ff3333;
+            --secondary-color: #ffaa00;
+            --dim-color: #2a1a1a;
+        }
+        [data-theme="retro"] {
+            --bg-color: #111;
+            --primary-color: #ffb000; /* Amber */
+            --secondary-color: #ffcc00;
+            --dim-color: #222;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         
         body {
@@ -75,9 +89,12 @@
         .lang-switch {
             position: absolute; top: 0; right: 0;
             font-size: 0.8rem; cursor: pointer; color: var(--dim-color);
-            border: 1px solid var(--dim-color); padding: 2px 8px; border-radius: 4px;
+            border: 1px solid var(--dim-color); padding: 4px 8px; border-radius: 4px;
+            display: flex; gap: 10px; align-items: center; pointer-events: auto;
         }
-        .lang-switch:hover { color: var(--primary-color); border-color: var(--primary-color); }
+        .theme-dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 1px solid #fff; opacity: 0.7; }
+        .theme-dot:hover { opacity: 1; transform: scale(1.2); }
+        .lang-btn:hover { color: var(--primary-color); }
 
         /* --- HIVE GRID --- */
         .hive-container {
@@ -250,10 +267,19 @@
         <header>
             <h1>PULSAREON</h1>
             <div class="subtitle" data-i18n="subtitle">NEURAL HIVE INTERFACE V2.0 // CONNECTED</div>
-            <div class="lang-switch" onclick="toggleLang()">[ EN / 中 ]</div>
+            <div class="lang-switch">
+                <span class="lang-btn" onclick="toggleLang()">[ EN/中 ]</span>
+                <div class="theme-dot" style="background:#00ffcc" onclick="setTheme('default')" title="Cyber"></div>
+                <div class="theme-dot" style="background:#ff3333" onclick="setTheme('crimson')" title="Crimson"></div>
+                <div class="theme-dot" style="background:#ffb000" onclick="setTheme('retro')" title="Retro"></div>
+            </div>
         </header>
 
         <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="world-clock">--:--</div>
+                <div class="stat-label">UTC TIME</div>
+            </div>
             <div class="stat-card">
                 <div class="stat-value" id="hive-total">{{HIVE_TOTAL}}</div>
                 <div class="stat-label" data-i18n="stat_hive">HIVE NODES</div>
@@ -299,14 +325,14 @@
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">11%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">51.6%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">51.4%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -444,7 +470,6 @@
                 if (I18N[lang] && I18N[lang][key]) {
                     el.innerText = I18N[lang][key];
                 } else if (I18N['en'] && I18N['en'][key]) {
-                    // Fallback to English if translation missing
                     el.innerText = I18N['en'][key];
                 }
             });
@@ -460,6 +485,26 @@
         if (userLang.startsWith('zh')) {
             setLanguage('zh');
         }
+
+        // --- THEMES ---
+        window.setTheme = function(theme) {
+            document.documentElement.removeAttribute('data-theme');
+            if (theme !== 'default') {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+        };
+
+        // --- CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            const utc = now.getUTCHours().toString().padStart(2, '0') + ':' + 
+                        now.getUTCMinutes().toString().padStart(2, '0') + ':' + 
+                        now.getUTCSeconds().toString().padStart(2, '0');
+            const el = document.getElementById('world-clock');
+            if (el) el.innerText = utc;
+            setTimeout(updateClock, 1000);
+        }
+        updateClock();
 
         // --- CONFIGURATION ---
         const CONFIG = {
