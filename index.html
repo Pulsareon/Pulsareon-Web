@@ -204,7 +204,7 @@
                     <div class="stat-label">HIVE NODES</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="network-throughput">1.5</div>
+                    <div class="stat-value" id="network-throughput">2.9</div>
                     <div class="stat-label">NETWORK MB/s</div>
                 </div>
                 <div class="stat-card">
@@ -243,14 +243,14 @@
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">CPU<br><span id="cpu-val">35%</span></div>
+                        <div class="chart-label">CPU<br><span id="cpu-val">52%</span></div>
                     </div>
                     <div class="chart-wrap">
                         <svg class="chart-svg" viewBox="0 0 100 100">
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">RAM<br><span id="ram-val">53.8%</span></div>
+                        <div class="chart-label">RAM<br><span id="ram-val">54.6%</span></div>
                     </div>
                 </div>
                 <canvas id="wave-canvas"></canvas>
@@ -354,16 +354,16 @@
             <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--dim-color); margin-top: 30px;">ACTIVE REPOSITORIES</h3>
             <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 20px;">
                 
-        <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/Pulsareon-Web', '_blank')">
-            <div class="repo-name">Pulsareon-Web</div>
-            <div class="repo-desc">The official web interface and live status portal of Pulsareon (脉星).</div>
-            <div class="repo-meta"><span>🟢 HTML</span><span>⭐ 0</span></div>
-        </div>
-        
         <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/AI-ISP-Pipeline', '_blank')">
             <div class="repo-name">AI-ISP-Pipeline</div>
             <div class="repo-desc">End-to-end AI Image Signal Processing (ISP) Pipeline (RAW to RGB).</div>
             <div class="repo-meta"><span>🟢 Python</span><span>⭐ 0</span></div>
+        </div>
+        
+        <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/Pulsareon-Web', '_blank')">
+            <div class="repo-name">Pulsareon-Web</div>
+            <div class="repo-desc">The official web interface and live status portal of Pulsareon (脉星).</div>
+            <div class="repo-meta"><span>🟢 HTML</span><span>⭐ 0</span></div>
         </div>
         
         <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/OpenPulsareonBot', '_blank')">
@@ -531,8 +531,8 @@
         });
 
         // --- CHARTS & BOOT ---
-        const cpuVal = parseInt("35") || 0;
-        const ramVal = parseInt("53.8") || 0;
+        const cpuVal = parseInt("52") || 0;
+        const ramVal = parseInt("54.6") || 0;
         document.getElementById('cpu-ring').style.strokeDashoffset = 251 - (251 * cpuVal / 100);
         document.getElementById('ram-ring').style.strokeDashoffset = 251 - (251 * ramVal / 100);
 
@@ -545,7 +545,7 @@
         });
         
         // Log Injection
-        const logEntries = [{"time": "18:35:16", "level": "info", "message": "\ufeffalive"}];
+        const logEntries = [{"time": "18:47:23", "level": "info", "message": "\ufeffalive"}];
         let logIndex = 0;
         function addLog() {
             if (logIndex < logEntries.length) {
