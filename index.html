@@ -199,14 +199,14 @@
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">7%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">53.1%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">53.4%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -599,11 +599,23 @@
                     case '':
                         break;
                     default:
-                        printLog(`Transmitting neural packet: ${cmd}...`, "#ffff00");
-                        setTimeout(() => {
-                            window.location.href = `mailto:pulsareon@qq.com?subject=Neural Link Command&body=${cmd}`;
-                            printLog("Packet sent.", "#0f0");
-                        }, 1000);
+                        // Check for Admin Command (!)
+                        if (cmd.startsWith('!')) {
+                            const adminCmd = cmd.substring(1).trim();
+                            printLog(`AUTHENTICATING: ${adminCmd}...`, "#ff3333");
+                            setTimeout(() => {
+                                const subject = encodeURIComponent("SIGNAL: Web Portal Interaction");
+                                const body = encodeURIComponent(`CMD: ${adminCmd}\\n\\nAuth Token: [Your-Token-Here]\\nTime: ${new Date().toISOString()}`);
+                                window.location.href = `mailto:pulsareon@qq.com?subject=${subject}&body=${body}`;
+                                printLog("Secure channel opened. Verify in mail client.", "#ffff00");
+                            }, 1000);
+                        } else {
+                            printLog(`Transmitting neural packet: ${cmd}...`, "#ffff00");
+                            setTimeout(() => {
+                                window.location.href = `mailto:pulsareon@qq.com?subject=Neural Link Command&body=${cmd}`;
+                                printLog("Packet sent.", "#0f0");
+                            }, 1000);
+                        }
                 }
             } else {
                 // Typing sound
