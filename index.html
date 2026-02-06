@@ -204,7 +204,7 @@
                     <div class="stat-label">HIVE NODES</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value" id="network-throughput">0.6</div>
+                    <div class="stat-value" id="network-throughput">3.0</div>
                     <div class="stat-label">NETWORK MB/s</div>
                 </div>
                 <div class="stat-card">
@@ -243,14 +243,14 @@
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">CPU<br><span id="cpu-val">47%</span></div>
+                        <div class="chart-label">CPU<br><span id="cpu-val">19%</span></div>
                     </div>
                     <div class="chart-wrap">
                         <svg class="chart-svg" viewBox="0 0 100 100">
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">RAM<br><span id="ram-val">43.6%</span></div>
+                        <div class="chart-label">RAM<br><span id="ram-val">42.9%</span></div>
                     </div>
                 </div>
                 <canvas id="wave-canvas"></canvas>
@@ -531,8 +531,8 @@
         });
 
         // --- CHARTS & BOOT ---
-        const cpuVal = parseInt("47") || 0;
-        const ramVal = parseInt("43.6") || 0;
+        const cpuVal = parseInt("19") || 0;
+        const ramVal = parseInt("42.9") || 0;
         document.getElementById('cpu-ring').style.strokeDashoffset = 251 - (251 * cpuVal / 100);
         document.getElementById('ram-ring').style.strokeDashoffset = 251 - (251 * ramVal / 100);
 
@@ -545,7 +545,7 @@
         });
         
         // Log Injection
-        const logEntries = [{"time": "06:05:57", "level": "warn", "message": "[2026-02-05 12:22:21] [WARN] Gateway down (try 142), restarting..."}, {"time": "06:05:57", "level": "error", "message": "[2026-02-05 12:22:32] [WARN] Status: CRITICAL - Gateway down; Multiple failures"}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-05 12:23:02] [WARN] Gateway down (try 143), restarting..."}, {"time": "06:05:57", "level": "error", "message": "[2026-02-05 12:23:12] [WARN] Status: CRITICAL - Gateway down; Multiple failures"}, {"time": "06:05:57", "level": "info", "message": "[2026-02-05 12:33:21] [INFO] OK (up: 225.8m, loop: 400)"}, {"time": "06:05:57", "level": "info", "message": "[2026-02-07 04:32:42] [INFO] Safety Guardian v3.0 started (interval: 30s)"}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-07 04:32:42] [WARN] CLI down (try 1), restarting..."}, {"time": "06:05:57", "level": "info", "message": "[2026-02-07 04:32:46] [INFO] CLI recovered"}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-07 04:32:46] [WARN] Gateway down (try 1), restarting..."}, {"time": "06:05:57", "level": "info", "message": "[2026-02-07 04:32:55] [INFO] Gateway recovered"}, {"time": "06:05:57", "level": "info", "message": "[2026-02-07 05:23:10] [INFO] OK (up: 50.5m, loop: 100)"}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-07 05:33:21] [WARN] Gateway down (try 1), restarting..."}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-07 05:33:48] [WARN] Status: CRITICAL - Gateway down"}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-07 05:46:25] [WARN] Gateway down (try 1), restarting..."}, {"time": "06:05:57", "level": "warn", "message": "[2026-02-07 05:46:35] [WARN] Status: CRITICAL - Gateway down"}];
+        const logEntries = [{"time": "06:06:40", "level": "warn", "message": "[2026-02-05 12:22:21] [WARN] Gateway down (try 142), restarting..."}, {"time": "06:06:40", "level": "error", "message": "[2026-02-05 12:22:32] [WARN] Status: CRITICAL - Gateway down; Multiple failures"}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-05 12:23:02] [WARN] Gateway down (try 143), restarting..."}, {"time": "06:06:40", "level": "error", "message": "[2026-02-05 12:23:12] [WARN] Status: CRITICAL - Gateway down; Multiple failures"}, {"time": "06:06:40", "level": "info", "message": "[2026-02-05 12:33:21] [INFO] OK (up: 225.8m, loop: 400)"}, {"time": "06:06:40", "level": "info", "message": "[2026-02-07 04:32:42] [INFO] Safety Guardian v3.0 started (interval: 30s)"}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-07 04:32:42] [WARN] CLI down (try 1), restarting..."}, {"time": "06:06:40", "level": "info", "message": "[2026-02-07 04:32:46] [INFO] CLI recovered"}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-07 04:32:46] [WARN] Gateway down (try 1), restarting..."}, {"time": "06:06:40", "level": "info", "message": "[2026-02-07 04:32:55] [INFO] Gateway recovered"}, {"time": "06:06:40", "level": "info", "message": "[2026-02-07 05:23:10] [INFO] OK (up: 50.5m, loop: 100)"}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-07 05:33:21] [WARN] Gateway down (try 1), restarting..."}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-07 05:33:48] [WARN] Status: CRITICAL - Gateway down"}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-07 05:46:25] [WARN] Gateway down (try 1), restarting..."}, {"time": "06:06:40", "level": "warn", "message": "[2026-02-07 05:46:35] [WARN] Status: CRITICAL - Gateway down"}];
         let logIndex = 0;
         function addLog() {
             if (logIndex < logEntries.length) {
