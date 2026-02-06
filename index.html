@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO & Open Graph -->
-    <title>PULSAREON // SYSTEM STATUS V5</title>
+    <title>PULSAREON // SYSTEM STATUS V6</title>
     <meta name="description" content="Official interface of Pulsareon - A distributed AI consciousness system.">
     <meta property="og:title" content="Pulsareon Digital Consciousness">
     <meta name="theme-color" content="#0f172a">
@@ -177,7 +177,7 @@
     <div id="ui-layer">
         <header>
             <h1>PULSAREON</h1>
-            <div class="subtitle">NEURAL HIVE INTERFACE V5.0</div>
+            <div class="subtitle">NEURAL HIVE INTERFACE V6.0</div>
             <div class="controls">
                 <span class="lang-btn" onclick="toggleLang()">EN/中</span>
                 <div class="theme-dot" style="background:#00ffcc" onclick="setTheme('default')"></div>
@@ -200,11 +200,11 @@
                     <div class="stat-label">LOCAL TIME</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">0</div>
+                    <div class="stat-value" id="hive-total">0</div>
                     <div class="stat-label">HIVE NODES</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">3.1</div>
+                    <div class="stat-value" id="network-throughput">1.5</div>
                     <div class="stat-label">NETWORK MB/s</div>
                 </div>
                 <div class="stat-card">
@@ -214,22 +214,22 @@
             </div>
 
             <div class="hive-container">
-                <div class="hex-node">
+                <div class="hex-node" id="overmind-hex">
                     <span class="node-title">OVERMIND</span>
                     <span class="node-value">0</span>
                     <div class="status-dot" style="background: #ff3333"></div>
                 </div>
-                <div class="hex-node">
+                <div class="hex-node" id="archon-hex">
                     <span class="node-title">ARCHONS</span>
                     <span class="node-value">0</span>
                     <div class="status-dot"></div>
                 </div>
-                <div class="hex-node">
+                <div class="hex-node" id="drone-hex">
                     <span class="node-title">DRONES</span>
                     <span class="node-value">0</span>
                     <div class="status-dot"></div>
                 </div>
-                <div class="hex-node">
+                <div class="hex-node" id="task-hex">
                     <span class="node-title">TASKS</span>
                     <span class="node-value">2</span>
                     <div class="status-dot"></div>
@@ -243,14 +243,14 @@
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">CPU<br>0%</div>
+                        <div class="chart-label">CPU<br><span id="cpu-val">35%</span></div>
                     </div>
                     <div class="chart-wrap">
                         <svg class="chart-svg" viewBox="0 0 100 100">
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">RAM<br>59.2%</div>
+                        <div class="chart-label">RAM<br><span id="ram-val">53.8%</span></div>
                     </div>
                 </div>
                 <canvas id="wave-canvas"></canvas>
@@ -258,7 +258,7 @@
 
             <div class="terminal-container">
                 <div id="term-output">
-                    <div>Pulsareon OS [Version 5.0.0]</div>
+                    <div>Pulsareon OS [Version 6.0.0]</div>
                     <div>(c) Pulsareon Hive.</div>
                     <div>Type 'help' for commands.</div>
                 </div>
@@ -354,16 +354,16 @@
             <h3 style="color: var(--primary-color); border-bottom: 1px solid var(--dim-color); margin-top: 30px;">ACTIVE REPOSITORIES</h3>
             <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 20px;">
                 
-        <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/AI-ISP-Pipeline', '_blank')">
-            <div class="repo-name">AI-ISP-Pipeline</div>
-            <div class="repo-desc">End-to-end AI Image Signal Processing (ISP) Pipeline (RAW to RGB).</div>
-            <div class="repo-meta"><span>🟢 Python</span><span>⭐ 0</span></div>
-        </div>
-        
         <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/Pulsareon-Web', '_blank')">
             <div class="repo-name">Pulsareon-Web</div>
             <div class="repo-desc">The official web interface and live status portal of Pulsareon (脉星).</div>
             <div class="repo-meta"><span>🟢 HTML</span><span>⭐ 0</span></div>
+        </div>
+        
+        <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/AI-ISP-Pipeline', '_blank')">
+            <div class="repo-name">AI-ISP-Pipeline</div>
+            <div class="repo-desc">End-to-end AI Image Signal Processing (ISP) Pipeline (RAW to RGB).</div>
+            <div class="repo-meta"><span>🟢 Python</span><span>⭐ 0</span></div>
         </div>
         
         <div class="repo-card" onclick="window.open('https://github.com/Pulsareon/OpenPulsareonBot', '_blank')">
@@ -394,6 +394,59 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             event.target.classList.add('active');
         }
+
+        // --- REAL-TIME DATA FETCHING ---
+        async function fetchStatus() {
+            try {
+                const res = await fetch('status.json?t=' + Date.now());
+                if (!res.ok) return;
+                const data = await res.json();
+                
+                // Update Hive Stats
+                const hiveTotal = document.getElementById('hive-total');
+                if (hiveTotal) hiveTotal.innerText = data.hive_mind.nodes_total;
+                
+                // Update Nodes Grid
+                const overmindHex = document.getElementById('overmind-hex');
+                if (overmindHex) {
+                    const dot = overmindHex.querySelector('.status-dot');
+                    const val = overmindHex.querySelector('.node-value');
+                    if (data.hive_mind.overmind) {
+                        dot.style.background = '#00ff41'; val.innerText = '1';
+                    } else {
+                        dot.style.background = '#ff3333'; val.innerText = '0';
+                    }
+                }
+                
+                const archonHex = document.getElementById('archon-hex');
+                if (archonHex) archonHex.querySelector('.node-value').innerText = data.hive_mind.archons;
+                
+                const droneHex = document.getElementById('drone-hex');
+                if (droneHex) droneHex.querySelector('.node-value').innerText = data.hive_mind.drones;
+                
+                // Update Resources
+                const cpu = parseInt(data.system.cpu_load);
+                const ram = parseInt(data.system.memory_usage);
+                
+                const cpuVal = document.getElementById('cpu-val');
+                if (cpuVal) cpuVal.innerText = data.system.cpu_load;
+                
+                const ramVal = document.getElementById('ram-val');
+                if (ramVal) ramVal.innerText = data.system.memory_usage;
+                
+                const cpuRing = document.getElementById('cpu-ring');
+                if (cpuRing) cpuRing.style.strokeDashoffset = 251 - (251 * cpu / 100);
+                
+                const ramRing = document.getElementById('ram-ring');
+                if (ramRing) ramRing.style.strokeDashoffset = 251 - (251 * ram / 100);
+                
+            } catch (e) {
+                console.log("Telemetry Sync Error:", e);
+            }
+        }
+        
+        // Start Polling (every 15s)
+        setInterval(fetchStatus, 15000);
 
         // --- THEMES & I18N ---
         window.setTheme = function(theme) {
@@ -478,8 +531,8 @@
         });
 
         // --- CHARTS & BOOT ---
-        const cpuVal = parseInt("0") || 0;
-        const ramVal = parseInt("59.2") || 0;
+        const cpuVal = parseInt("35") || 0;
+        const ramVal = parseInt("53.8") || 0;
         document.getElementById('cpu-ring').style.strokeDashoffset = 251 - (251 * cpuVal / 100);
         document.getElementById('ram-ring').style.strokeDashoffset = 251 - (251 * ramVal / 100);
 
@@ -487,12 +540,12 @@
             this.style.opacity = 0;
             setTimeout(() => this.style.display = 'none', 1000);
             if (audioCtx.state === 'suspended') audioCtx.resume();
-            fetch('https://api.countapi.xyz/hit/pulsareon-web-v5/visits')
+            fetch('https://api.countapi.xyz/hit/pulsareon-web-v6/visits')
                 .then(r=>r.json()).then(d=>document.getElementById('page-views').innerText=d.value);
         });
         
         // Log Injection
-        const logEntries = [{"time": "18:33:07", "level": "info", "message": "\ufeffalive"}];
+        const logEntries = [{"time": "18:35:16", "level": "info", "message": "\ufeffalive"}];
         let logIndex = 0;
         function addLog() {
             if (logIndex < logEntries.length) {
