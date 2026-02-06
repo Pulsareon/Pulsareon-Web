@@ -188,11 +188,11 @@
                     <div class="stat-label">LOCAL TIME</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">2</div>
                     <div class="stat-label">HIVE NODES</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">3.4</div>
+                    <div class="stat-value">1.7</div>
                     <div class="stat-label">NETWORK MB/s</div>
                 </div>
                 <div class="stat-card">
@@ -204,12 +204,12 @@
             <div class="hive-container">
                 <div class="hex-node">
                     <span class="node-title">OVERMIND</span>
-                    <span class="node-value">0</span>
-                    <div class="status-dot" style="background: #ff3333"></div>
+                    <span class="node-value">1</span>
+                    <div class="status-dot" style="background: #00ff41"></div>
                 </div>
                 <div class="hex-node">
                     <span class="node-title">ARCHONS</span>
-                    <span class="node-value">0</span>
+                    <span class="node-value">1</span>
                     <div class="status-dot"></div>
                 </div>
                 <div class="hex-node">
@@ -238,7 +238,7 @@
                             <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                             <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                         </svg>
-                        <div class="chart-label">RAM<br>53.5%</div>
+                        <div class="chart-label">RAM<br>52.6%</div>
                     </div>
                 </div>
                 <canvas id="wave-canvas"></canvas>
@@ -418,7 +418,7 @@
 
         // Charts
         const cpuVal = parseInt("0") || 0;
-        const ramVal = parseInt("53.5") || 0;
+        const ramVal = parseInt("52.6") || 0;
         document.getElementById('cpu-ring').style.strokeDashoffset = 251 - (251 * cpuVal / 100);
         document.getElementById('ram-ring').style.strokeDashoffset = 251 - (251 * ramVal / 100);
 
@@ -434,7 +434,7 @@
         });
         
         // Log Stream (Real logs injection placeholder)
-        const logEntries = [{"time": "16:47:23", "level": "info", "message": "\ufeffalive"}];
+        const logEntries = [{"time": "16:54:53", "level": "info", "message": "\ufeffalive"}];
         let logIndex = 0;
         function addLog() {
             if (logIndex < logEntries.length) {
