@@ -286,7 +286,7 @@ html_content = r"""<!DOCTYPE html>
                 <div class="stat-label" data-i18n="stat_hive">HIVE NODES</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="network-throughput">4.0</div>
+                <div class="stat-value" id="network-throughput">2.9</div>
                 <div class="stat-label" data-i18n="stat_net">NETWORK MB/s</div>
             </div>
             <div class="stat-card">
@@ -326,14 +326,14 @@ html_content = r"""<!DOCTYPE html>
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">34%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">51.8%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">51.9%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -399,7 +399,7 @@ html_content = r"""<!DOCTYPE html>
                 <br>
                 <div data-i18n="term_help">Type 'help' for available commands.</div>
                 <br>
-                <div>const logEntries = [{"time": "16:43:14", "level": "info", "message": "\ufeffalive"}];</div>
+                <div>const logEntries = [{"time": "16:44:33", "level": "info", "message": "\ufeffalive"}];</div>
             </div>
             <div class="cmd-line">
                 <span class="prompt">root@pulsareon:~$</span>
@@ -500,11 +500,18 @@ html_content = r"""<!DOCTYPE html>
         // --- CLOCK ---
         function updateClock() {
             const now = new Date();
-            const utc = now.getUTCHours().toString().padStart(2, '0') + ':' + 
-                        now.getUTCMinutes().toString().padStart(2, '0') + ':' + 
-                        now.getUTCSeconds().toString().padStart(2, '0');
+            // Local time in 24h format
+            const timeString = now.toLocaleTimeString([], {hour12: false});
+            // Get timezone (e.g. Asia/Shanghai)
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone.split('/')[1] || 'LOCAL';
+            
             const el = document.getElementById('world-clock');
-            if (el) el.innerText = utc;
+            // Find the label element (next sibling)
+            const label = el ? el.nextElementSibling : null;
+            
+            if (el) el.innerText = timeString;
+            if (label) label.innerText = `${timeZone.toUpperCase()} TIME`;
+            
             setTimeout(updateClock, 1000);
         }
         updateClock();
@@ -918,7 +925,7 @@ html_content = r"""<!DOCTYPE html>
         });
 
         // Log Data Placeholder
-        const logEntries = [{"time": "16:43:14", "level": "info", "message": "\ufeffalive"}];
+        const logEntries = [{"time": "16:44:33", "level": "info", "message": "\ufeffalive"}];
 
         // Log Stream
         const logStream = document.getElementById('log-stream');
