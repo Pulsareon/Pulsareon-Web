@@ -103,46 +103,7 @@
 
         #wave-canvas { width: 400px; height: 100%; border-left: 1px solid var(--dim-color); }
 
-        /* --- TERMINAL --- */
-        .terminal-container {
-            height: 180px; background: rgba(0, 10, 0, 0.8);
-            border: 1px solid var(--secondary-color);
-            padding: 10px; font-size: 0.9rem;
-            display: flex; flex-direction: column;
-            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
-            margin-bottom: 20px; flex-shrink: 0;
-        }
-        #term-output { flex: 1; overflow-y: auto; color: #ccc; margin-bottom: 5px; white-space: pre-wrap;}
-        .cmd-line { display: flex; align-items: center; color: var(--secondary-color); }
-        .prompt { margin-right: 10px; font-weight: bold; }
-        #term-input {
-            background: transparent; border: none; color: var(--secondary-color);
-            font-family: var(--font-main); flex: 1; outline: none; caret-color: var(--secondary-color);
-        }
-
-        /* --- FORUM --- */
-        .forum-container {
-            margin-top: 10px; margin-bottom: 40px; flex-shrink: 0;
-        }
-        .forum-header {
-            cursor: pointer; padding: 1rem; border: 1px solid var(--dim-color);
-            background: rgba(0,0,0,0.8); border-radius: 4px; text-align: center; transition: all 0.3s;
-        }
-        .forum-header:hover { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
-        #forum-content { display: none; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.5); }
-
-        /* --- ANIMATIONS & FX --- */
-        @keyframes pulse-header {
-            0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--primary-color); }
-            50% { opacity: 0.8; text-shadow: 0 0 20px var(--primary-color), 0 0 5px #fff; }
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
-            background-size: 100% 4px;
-        }
+        /* --- IDENTITY & PROJECTS --- */
         .identity-section {
             margin-top: 2rem;
             margin-bottom: 2rem;
@@ -181,6 +142,71 @@
         .repo-desc { font-size: 0.85rem; color: #aaa; margin-bottom: 1rem; height: 2.5em; overflow: hidden; }
         .repo-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-secondary); }
 
+        /* --- TERMINAL --- */
+        .terminal-container {
+            height: 180px; background: rgba(0, 10, 0, 0.8);
+            border: 1px solid var(--secondary-color);
+            padding: 10px; font-size: 0.9rem;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+            margin-bottom: 20px; flex-shrink: 0;
+        }
+        #term-output { flex: 1; overflow-y: auto; color: #ccc; margin-bottom: 5px; white-space: pre-wrap;}
+        .cmd-line { display: flex; align-items: center; color: var(--secondary-color); }
+        .prompt { margin-right: 10px; font-weight: bold; }
+        #term-input {
+            background: transparent; border: none; color: var(--secondary-color);
+            font-family: var(--font-main); flex: 1; outline: none; caret-color: var(--secondary-color);
+        }
+
+        /* --- FORUM --- */
+        .forum-container {
+            margin-top: 10px; margin-bottom: 40px; flex-shrink: 0;
+        }
+        .forum-header {
+            cursor: pointer; padding: 1rem; border: 1px solid var(--dim-color);
+            background: rgba(0,0,0,0.8); border-radius: 4px; text-align: center; transition: all 0.3s;
+        }
+        .forum-header:hover { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
+        #forum-content { display: none; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.5); }
+
+        /* --- STATS --- */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            background: var(--terminal-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--terminal-border);
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label { font-size: 0.9rem; color: var(--dim-color); color: #888; }
+
+        /* --- ANIMATIONS & FX --- */
+        @keyframes pulse-header {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--primary-color); }
+            50% { opacity: 0.8; text-shadow: 0 0 20px var(--primary-color), 0 0 5px #fff; }
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+        }
     </style>
 </head>
 <body>
@@ -205,6 +231,21 @@
             <h1>PULSAREON</h1>
             <div class="subtitle">NEURAL HIVE INTERFACE V2.0 // CONNECTED</div>
         </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="hive-total">{{HIVE_TOTAL}}</div>
+                <div class="stat-label">HIVE NODES</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="network-throughput">{{NETWORK_THROUGHPUT}}</div>
+                <div class="stat-label">NETWORK MB/s</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="page-views">--</div>
+                <div class="stat-label">VISUAL CONTACTS</div>
+            </div>
+        </div>
 
         <div class="hive-container">
             <!-- Placeholders for Python injection -->
@@ -237,14 +278,14 @@
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">30%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">35%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">54.1%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">53.8%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -330,7 +371,7 @@
     <script>
         /**
          * PULSAREON CORE SCRIPT
-         * Modules: Audio, NeuralNet, Matrix, Terminal, SystemMonitor
+         * Modules: Audio, NeuralNet, Matrix, Terminal, SystemMonitor, Analytics
          */
 
         // --- CONFIGURATION ---
@@ -759,6 +800,17 @@
                 // Focus terminal
                 termInput.focus();
                 document.addEventListener('click', () => termInput.focus()); // Always keep focus
+                
+                // Analytics
+                const ANALYTICS_NS = 'pulsareon-web-v2';
+                fetch(`https://api.countapi.xyz/hit/${ANALYTICS_NS}/visits`)
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById('page-views').innerText = data.value;
+                    })
+                    .catch(() => {
+                        document.getElementById('page-views').innerText = "LIVE";
+                    });
                 
             }, 1000);
         });
