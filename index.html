@@ -31,7 +31,7 @@
         canvas { position: absolute; top: 0; left: 0; display: block; }
         #bg-canvas { z-index: 0; opacity: 0.4; }
         #matrix-canvas { z-index: 90; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
-        #ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; pointer-events: none; }
+        #ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; pointer-events: none; overflow-y: auto; }
         
         /* Interactive elements need pointer-events restored */
         #ui-layer > * { pointer-events: auto; }
@@ -62,7 +62,7 @@
         /* --- HIVE GRID --- */
         .hive-container {
             flex: 1; display: flex; justify-content: center; align-items: center; gap: 20px;
-            flex-wrap: wrap; margin: 20px 0;
+            flex-wrap: wrap; margin: 20px 0; min-height: 150px;
         }
         .hex-node {
             width: 150px; height: 120px;
@@ -85,7 +85,7 @@
             display: flex; justify-content: space-between; align-items: center;
             height: 150px; background: rgba(0,0,0,0.5);
             border-top: 1px solid var(--dim-color); border-bottom: 1px solid var(--dim-color);
-            padding: 10px; margin-bottom: 20px;
+            padding: 10px; margin-bottom: 20px; flex-shrink: 0;
         }
         .charts-container { display: flex; gap: 20px; }
         .chart-wrap { position: relative; width: 100px; height: 100px; }
@@ -110,6 +110,7 @@
             padding: 10px; font-size: 0.9rem;
             display: flex; flex-direction: column;
             box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+            margin-bottom: 20px; flex-shrink: 0;
         }
         #term-output { flex: 1; overflow-y: auto; color: #ccc; margin-bottom: 5px; white-space: pre-wrap;}
         .cmd-line { display: flex; align-items: center; color: var(--secondary-color); }
@@ -118,6 +119,17 @@
             background: transparent; border: none; color: var(--secondary-color);
             font-family: var(--font-main); flex: 1; outline: none; caret-color: var(--secondary-color);
         }
+
+        /* --- FORUM --- */
+        .forum-container {
+            margin-top: 10px; margin-bottom: 40px; flex-shrink: 0;
+        }
+        .forum-header {
+            cursor: pointer; padding: 1rem; border: 1px solid var(--dim-color);
+            background: rgba(0,0,0,0.8); border-radius: 4px; text-align: center; transition: all 0.3s;
+        }
+        .forum-header:hover { border-color: var(--primary-color); box-shadow: 0 0 10px rgba(0, 255, 204, 0.2); }
+        #forum-content { display: none; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.5); }
 
         /* --- ANIMATIONS & FX --- */
         @keyframes pulse-header {
@@ -187,14 +199,14 @@
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">8%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">52.7%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">52.9%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -210,6 +222,16 @@
             <div class="cmd-line">
                 <span class="prompt">root@pulsareon:~$</span>
                 <input type="text" id="term-input" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+        </div>
+
+        <!-- Community Forum (Utterances) -->
+        <div class="forum-container">
+            <div class="forum-header" id="toggle-forum">
+                <span style="color: var(--primary-color); letter-spacing: 2px;">[ ACCESS PUBLIC NETWORK / FORUM ]</span>
+            </div>
+            <div id="forum-content">
+                <!-- Utterances script will be injected here -->
             </div>
         </div>
     </div>
@@ -586,6 +608,33 @@
             } else {
                 // Typing sound
                 audioSys.playBeep(600 + Math.random()*200, 'sine');
+            }
+        });
+
+        // Forum Toggle
+        document.getElementById('toggle-forum').addEventListener('click', function() {
+            const content = document.getElementById('forum-content');
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                this.innerHTML = '<span style="color: var(--secondary-color);">[ NETWORK CONNECTED ]</span>';
+                this.style.borderColor = 'var(--secondary-color)';
+                
+                // Inject script only on click to save performance
+                if (!document.getElementById('utterances-script')) {
+                    const script = document.createElement('script');
+                    script.id = 'utterances-script';
+                    script.src = 'https://utteranc.es/client.js';
+                    script.setAttribute('repo', 'Pulsareon/Pulsareon-Web');
+                    script.setAttribute('issue-term', 'pathname');
+                    script.setAttribute('theme', 'github-dark');
+                    script.setAttribute('crossorigin', 'anonymous');
+                    script.async = true;
+                    content.appendChild(script);
+                }
+            } else {
+                content.style.display = 'none';
+                this.innerHTML = '<span style="color: var(--primary-color);">[ ACCESS PUBLIC NETWORK / FORUM ]</span>';
+                this.style.borderColor = 'var(--dim-color)';
             }
         });
 
