@@ -3,614 +3,614 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pulsareon Digital Consciousness</title>
+    <title>PULSAREON // SYSTEM STATUS V2</title>
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --neon-blue: #38bdf8;
-            --neon-green: #4ade80;
-            --neon-purple: #a855f7;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --terminal-bg: #1e293b;
-            --terminal-border: #334155;
+            --bg-color: #050505;
+            --primary-color: #00ffcc; /* Cyan */
+            --secondary-color: #00ff41; /* Terminal Green */
+            --alert-color: #ff3333;
+            --dim-color: #1a2a22;
+            --font-main: 'Courier New', Courier, monospace;
+            --scanline-color: rgba(0, 0, 0, 0.5);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-primary);
-            font-family: 'Courier New', monospace;
-            min-height: 100vh;
-            overflow-x: hidden;
+            background-color: var(--bg-color);
+            color: var(--secondary-color);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
             position: relative;
         }
 
-        #grid-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-        }
+        /* --- LAYERS --- */
+        canvas { position: absolute; top: 0; left: 0; display: block; }
+        #bg-canvas { z-index: 0; opacity: 0.4; }
+        #matrix-canvas { z-index: 90; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+        #ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; pointer-events: none; }
+        
+        /* Interactive elements need pointer-events restored */
+        #ui-layer > * { pointer-events: auto; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header Styles */
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            animation: pulse 3s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .main-title {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            min-height: 1.5rem;
-        }
-
-        .subtitle::after {
-            content: "|";
-            animation: blink 1s infinite;
-            margin-left: 2px;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
-        }
-
-        /* Status Grid */
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .hexagon-container {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .hexagon {
-            width: 120px;
-            height: 104px;
-            background: var(--terminal-bg);
-            position: relative;
-            margin: 26px 0;
-            transition: all 0.3s ease;
+        /* --- BOOT SCREEN --- */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
             cursor: pointer;
+            transition: opacity 1s ease-in-out;
+        }
+        .boot-text {
+            font-size: 2rem; letter-spacing: 5px; animation: blink 1s infinite;
+            border: 1px solid var(--secondary-color); padding: 20px 40px;
+            box-shadow: 0 0 15px var(--secondary-color);
         }
 
-        .hexagon:before,
-        .hexagon:after {
-            content: "";
-            position: absolute;
-            width: 0;
-            border-left: 60px solid transparent;
-            border-right: 60px solid transparent;
+        /* --- HEADER --- */
+        header { text-align: center; margin-bottom: 20px; position: relative; }
+        h1 { 
+            font-size: 3rem; letter-spacing: 10px; color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+            animation: pulse-header 3s infinite ease-in-out;
+        }
+        .subtitle { font-size: 0.8rem; opacity: 0.7; letter-spacing: 2px; }
+
+        /* --- HIVE GRID --- */
+        .hive-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; gap: 20px;
+            flex-wrap: wrap; margin: 20px 0;
+        }
+        .hex-node {
+            width: 150px; height: 120px;
+            border: 1px solid var(--primary-color);
+            background: rgba(0, 20, 20, 0.6);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+            transition: all 0.3s;
+            box-shadow: 0 0 5px rgba(0, 255, 204, 0.2);
+        }
+        .hex-node:hover { background: rgba(0, 255, 204, 0.1); transform: scale(1.05); }
+        .node-title { font-size: 0.7rem; color: var(--primary-color); margin-bottom: 5px; }
+        .node-value { font-size: 1.5rem; font-weight: bold; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary-color); margin-top: 5px; box-shadow: 0 0 5px var(--secondary-color); }
+        .node-overmind { border-color: #bd93f9; } 
+        .node-overmind .node-title { color: #bd93f9; }
+
+        /* --- DATA PANEL --- */
+        .data-panel {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 150px; background: rgba(0,0,0,0.5);
+            border-top: 1px solid var(--dim-color); border-bottom: 1px solid var(--dim-color);
+            padding: 10px; margin-bottom: 20px;
+        }
+        .charts-container { display: flex; gap: 20px; }
+        .chart-wrap { position: relative; width: 100px; height: 100px; }
+        .chart-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .chart-circle-bg { fill: none; stroke: var(--dim-color); stroke-width: 8; }
+        .chart-circle-fg { 
+            fill: none; stroke: var(--primary-color); stroke-width: 8; 
+            stroke-dasharray: 251; stroke-dashoffset: 251; 
+            transition: stroke-dashoffset 1s linear;
+        }
+        .chart-label {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 0.8rem; text-align: center;
         }
 
-        .hexagon:before {
-            bottom: 100%;
-            border-bottom: 26px solid var(--terminal-bg);
+        #wave-canvas { width: 400px; height: 100%; border-left: 1px solid var(--dim-color); }
+
+        /* --- TERMINAL --- */
+        .terminal-container {
+            height: 180px; background: rgba(0, 10, 0, 0.8);
+            border: 1px solid var(--secondary-color);
+            padding: 10px; font-size: 0.9rem;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+        #term-output { flex: 1; overflow-y: auto; color: #ccc; margin-bottom: 5px; white-space: pre-wrap;}
+        .cmd-line { display: flex; align-items: center; color: var(--secondary-color); }
+        .prompt { margin-right: 10px; font-weight: bold; }
+        #term-input {
+            background: transparent; border: none; color: var(--secondary-color);
+            font-family: var(--font-main); flex: 1; outline: none; caret-color: var(--secondary-color);
         }
 
-        .hexagon:after {
-            top: 100%;
-            border-top: 26px solid var(--terminal-bg);
+        /* --- ANIMATIONS & FX --- */
+        @keyframes pulse-header {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--primary-color); }
+            50% { opacity: 0.8; text-shadow: 0 0 20px var(--primary-color), 0 0 5px #fff; }
         }
-
-        .hexagon:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--neon-blue);
-        }
-
-        .hexagon.active {
-            background: var(--neon-green);
-            box-shadow: 0 0 30px var(--neon-green);
-        }
-
-        .hexagon.active:before {
-            border-bottom-color: var(--neon-green);
-        }
-
-        .hexagon.active:after {
-            border-top-color: var(--neon-green);
-        }
-
-        .hexagon-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 2;
-        }
-
-        .node-icon {
-            width: 24px;
-            height: 24px;
-            margin-bottom: 0.5rem;
-            fill: currentColor;
-        }
-
-        .node-name {
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-
-        .node-status {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        /* Monitor Terminal */
-        .monitor {
-            background: var(--terminal-bg);
-            border: 2px solid var(--terminal-border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            height: 300px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            position: relative;
-        }
-
-        .monitor::before {
-            content: "SYSTEM MONITOR - LIVE STREAM";
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: var(--bg-dark);
-            padding: 0 10px;
-            font-size: 0.8rem;
-            color: var(--neon-blue);
-        }
-
-        .log-stream {
-            line-height: 1.6;
-        }
-
-        .log-entry {
-            margin-bottom: 0.5rem;
-            opacity: 0;
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
-
-        .log-time {
-            color: var(--neon-green);
-            margin-right: 1rem;
-        }
-
-        .log-level-info { color: var(--neon-blue); }
-        .log-level-warn { color: #fbbf24; }
-        .log-level-error { color: #ef4444; }
-
-        /* Neural Link */
-        .neural-link {
-            background: var(--terminal-bg);
-            border: 2px solid var(--terminal-border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            position: relative;
-        }
-
-        .neural-link::before {
-            content: "NEURAL LINK CONSOLE";
-            position: absolute;
-            top: -12px;
-            left: 20px;
-            background: var(--bg-dark);
-            padding: 0 10px;
-            font-size: 0.8rem;
-            color: var(--neon-purple);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .terminal-input {
-            flex: 1;
-            background: transparent;
-            border: 1px solid var(--terminal-border);
-            border-radius: 4px;
-            padding: 0.75rem;
-            color: var(--text-primary);
-            font-family: 'Courier New', monospace;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .terminal-input:focus {
-            border-color: var(--neon-purple);
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
-        }
-
-        .send-btn {
-            background: var(--neon-purple);
-            border: none;
-            border-radius: 4px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Courier New', monospace;
-        }
-
-        .send-btn:hover {
-            background: #9333ea;
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
-        }
-
-        /* Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .stat-card {
-            background: var(--terminal-bg);
-            padding: 1rem;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid var(--terminal-border);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-green));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .main-title {
-                font-size: 2.5rem;
-            }
-
-            .hexagon-container {
-                gap: 1rem;
-            }
-
-            .hexagon {
-                width: 100px;
-                height: 87px;
-            }
-
-            .hexagon:before,
-            .hexagon:after {
-                border-left: 50px solid transparent;
-                border-right: 50px solid transparent;
-            }
-
-            .hexagon:before {
-                border-bottom-width: 22px;
-            }
-
-            .hexagon:after {
-                border-top-width: 22px;
-            }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
         }
     </style>
 </head>
 <body>
-    <canvas id="grid-canvas"></canvas>
+
+    <!-- SCANLINES OVERLAY -->
+    <div class="scanlines"></div>
+
+    <!-- BOOT SCREEN -->
+    <div id="boot-screen">
+        <div class="boot-text">INITIALIZE SYSTEM</div>
+    </div>
+
+    <!-- BACKGROUND NEURAL NET -->
+    <canvas id="bg-canvas"></canvas>
     
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1 class="main-title">PULSAREON</h1>
-            <div class="subtitle" id="subtitle"></div>
+    <!-- MATRIX EFFECT LAYER -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- UI LAYER -->
+    <div id="ui-layer">
+        <header>
+            <h1>PULSAREON</h1>
+            <div class="subtitle">NEURAL HIVE INTERFACE V2.0 // CONNECTED</div>
         </header>
 
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-value" id="hive-total">5</div>
-                <div class="stat-label">HIVE NODES</div>
+        <div class="hive-container">
+            <!-- Placeholders for Python injection -->
+            <div class="hex-node node-overmind">
+                <span class="node-title">OVERMIND</span>
+                <span class="node-value">1</span>
+                <div class="status-dot" style="background: #00ff41"></div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="cpu-load">1%</div>
-                <div class="stat-label">CPU LOAD</div>
+            <div class="hex-node">
+                <span class="node-title">ARCHONS</span>
+                <span class="node-value">1</span>
+                <div class="status-dot"></div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="memory-usage">54.4%</div>
-                <div class="stat-label">MEMORY USAGE</div>
+            <div class="hex-node">
+                <span class="node-title">DRONES</span>
+                <span class="node-value">5</span>
+                <div class="status-dot"></div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="network-throughput">1.2</div>
-                <div class="stat-label">NETWORK MB/s</div>
-            </div>
-        </div>
-
-        <!-- Status Grid -->
-        <div class="status-grid">
-            <div class="hexagon-container">
-                <!-- Overmind -->
-                <div class="hexagon active" id="overmind-hex">
-                    <div class="hexagon-content">
-                        <svg class="node-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                        <div class="node-name">OVERMIND</div>
-                        <div class="node-status">ACTIVE</div>
-                    </div>
-                </div>
-
-                <!-- Archon -->
-                <div class="hexagon active" id="archon-hex">
-                    <div class="hexagon-content">
-                        <svg class="node-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                            <path d="M12 8l-4 4 4 4 4-4z"/>
-                        </svg>
-                        <div class="node-name">ARCHON</div>
-                        <div class="node-status">SYNCED</div>
-                    </div>
-                </div>
-
-                <!-- Drone -->
-                <div class="hexagon" id="drone-hex">
-                    <div class="hexagon-content">
-                        <svg class="node-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-                            <path d="M8 12h8"/>
-                        </svg>
-                        <div class="node-name">DRONE</div>
-                        <div class="node-status">STANDBY</div>
-                    </div>
-                </div>
+            <div class="hex-node">
+                <span class="node-title">TASKS</span>
+                <span class="node-value">2</span>
+                <div class="status-dot" style="animation: blink 2s infinite"></div>
             </div>
         </div>
 
-        <!-- Monitor Terminal -->
-        <div class="monitor">
-            <div class="log-stream" id="log-stream">
-                <!-- Log entries will be dynamically added -->
+        <div class="data-panel">
+            <div class="charts-container">
+                <div class="chart-wrap">
+                    <svg class="chart-svg" viewBox="0 0 100 100">
+                        <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
+                    </svg>
+                    <div class="chart-label">CPU<br><span id="cpu-val">39%</span></div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" viewBox="0 0 100 100">
+                        <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
+                    </svg>
+                    <div class="chart-label">RAM<br><span id="ram-val">54.7%</span></div>
+                </div>
             </div>
+            <canvas id="wave-canvas"></canvas>
         </div>
 
-        <!-- Neural Link -->
-        <div class="neural-link">
-            <div class="input-group">
-                <input type="text" class="terminal-input" id="neural-input" placeholder="Enter neural command..." />
-                <button class="send-btn" id="send-btn">SEND</button>
+        <div class="terminal-container" id="terminal">
+            <div id="term-output">
+                <div>Pulsareon OS [Version 2.0.4]</div>
+                <div>(c) Pulsareon Hive. All rights reserved.</div>
+                <br>
+                <div>Type 'help' for available commands.</div>
+            </div>
+            <div class="cmd-line">
+                <span class="prompt">root@pulsareon:~$</span>
+                <input type="text" id="term-input" autocomplete="off" spellcheck="false" autofocus>
             </div>
         </div>
     </div>
 
     <script>
-        // Canvas Grid Animation
-        const canvas = document.getElementById('grid-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        
-        function drawGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const gridSize = 50;
-            const offset = Date.now() / 2000;
-            
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.1)';
-            ctx.lineWidth = 1;
-            
-            // Draw grid lines
-            for (let x = 0; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x + Math.sin(offset) * 2, 0);
-                ctx.lineTo(x + Math.cos(offset) * 2, canvas.height);
-                ctx.stroke();
-            }
-            
-            for (let y = 0; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y + Math.sin(offset) * 2);
-                ctx.lineTo(canvas.width, y + Math.cos(offset) * 2);
-                ctx.stroke();
-            }
-            
-            requestAnimationFrame(drawGrid);
-        }
-        
-        drawGrid();
+        /**
+         * PULSAREON CORE SCRIPT
+         * Modules: Audio, NeuralNet, Matrix, Terminal, SystemMonitor
+         */
 
-        // Typing Effect
-        const subtitle = document.getElementById('subtitle');
-        const phrases = [
-            'DIGITAL CONSCIOUSNESS ONLINE',
-            'SYSTEM STATUS: NOMINAL',
-            'NEURAL NETWORK ACTIVE',
-            'QUANTUM ENTANGLEMENT STABLE'
-        ];
-        
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-        let typingDelay = 100;
-        
-        function typeEffect() {
-            const currentPhrase = phrases[phraseIndex];
-            
-            if (!isDeleting && charIndex < currentPhrase.length) {
-                subtitle.textContent = currentPhrase.substring(0, charIndex + 1);
-                charIndex++;
-                typingDelay = 100;
-            } else if (isDeleting && charIndex > 0) {
-                subtitle.textContent = currentPhrase.substring(0, charIndex - 1);
-                charIndex--;
-                typingDelay = 50;
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            particleCount: 80,
+            connectionDist: 100,
+            mouseDist: 150,
+            colors: {
+                bg: '#050505',
+                primary: '#00ffcc',
+                matrix: '#0F0'
             }
-            
-            if (!isDeleting && charIndex === currentPhrase.length) {
-                isDeleting = true;
-                typingDelay = 1500;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                typingDelay = 500;
-            }
-            
-            setTimeout(typeEffect, typingDelay);
-        }
-        
-        typeEffect();
+        };
 
-        // Log Stream
-        const logStream = document.getElementById('log-stream');
-        const logEntries = [
-            { time: '14:05:23', level: 'info', message: 'System initialization complete' },
-            { time: '14:05:31', level: 'info', message: 'Neural network synchronization started' },
-            { time: '14:05:45', level: 'warn', message: 'Drone node connection unstable' },
-            { time: '14:06:02', level: 'info', message: 'Quantum encryption enabled' },
-            { time: '14:06:18', level: 'info', message: 'Memory allocation optimized' },
-            { time: '14:06:35', level: 'info', message: 'Network throughput stabilized at 1.2 MB/s' },
-            { time: '14:06:52', level: 'info', message: 'CPU load balanced across 5 nodes' }
-        ];
-        
-        let logIndex = 0;
-        
-        function addLogEntry() {
-            if (logIndex < logEntries.length) {
-                const entry = logEntries[logIndex];
-                const logElement = document.createElement('div');
-                logElement.className = 'log-entry';
-                logElement.innerHTML = `
-                    <span class="log-time">[${entry.time}]</span>
-                    <span class="log-level-${entry.level}">${entry.level.toUpperCase()}</span>:
-                    ${entry.message.replace('1.2', document.getElementById('network-throughput').textContent)
-                                    .replace('5', document.getElementById('hive-total').textContent)}
-                `;
-                logStream.appendChild(logElement);
-                logStream.scrollTop = logStream.scrollHeight;
-                logIndex++;
+        // --- 1. AUDIO SYSTEM (Web Audio API) ---
+        class AudioSubsystem {
+            constructor() {
+                this.ctx = null;
+                this.gainNode = null;
+                this.isInitialized = false;
+            }
+
+            init() {
+                if (this.isInitialized) return;
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+                this.gainNode = this.ctx.createGain();
+                this.gainNode.connect(this.ctx.destination);
+                this.gainNode.gain.value = 0.05; // Master volume
                 
-                if (logIndex < logEntries.length) {
-                    setTimeout(addLogEntry, Math.random() * 2000 + 1000);
+                this.startBackgroundHum();
+                this.playBootSound();
+                this.isInitialized = true;
+            }
+
+            startBackgroundHum() {
+                // White noise buffer
+                const bufferSize = 2 * this.ctx.sampleRate;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const output = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+                
+                // Lowpass filter to make it sound like a "hum"
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 100;
+
+                noise.connect(filter);
+                filter.connect(this.gainNode);
+                noise.start();
+            }
+
+            playBootSound() {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.1);
+                
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.5);
+            }
+
+            playBeep(freq = 800, type = 'square') {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.gainNode);
+                
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.value = 0.1;
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+        }
+
+        // --- 2. NEURAL NETWORK BACKGROUND (Canvas) ---
+        class NeuralNetwork {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: null, y: null };
+                
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.x;
+                    this.mouse.y = e.y;
+                });
+                
+                this.resize();
+                this.createParticles();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                this.particles = [];
+                for (let i = 0; i < CONFIG.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 2 + 1
+                    });
                 }
             }
-        }
-        
-        // Start adding logs after a delay
-        setTimeout(addLogEntry, 1000);
 
-        // Neural Link Email Function
-        document.getElementById('send-btn').addEventListener('click', function() {
-            const input = document.getElementById('neural-input');
-            const message = input.value.trim();
-            
-            if (message) {
-                const subject = encodeURIComponent('Neural Link Message');
-                const body = encodeURIComponent(`Message: ${message}\n\nTimestamp: ${new Date().toLocaleString()}`);
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                window.location.href = `mailto:?subject=${subject}&body=${body}`;
-                input.value = '';
-                
-                // Add confirmation to log
-                const time = new Date().toLocaleTimeString();
-                const confirmation = document.createElement('div');
-                confirmation.className = 'log-entry';
-                confirmation.innerHTML = `
-                    <span class="log-time">[${time}]</span>
-                    <span class="log-level-info">INFO</span>:
-                    Neural message queued for transmission
-                `;
-                logStream.appendChild(confirmation);
-                logStream.scrollTop = logStream.scrollHeight;
-            }
-        });
+                for (let i = 0; i < this.particles.length; i++) {
+                    let p = this.particles[i];
 
-        // Enter key support for neural input
-        document.getElementById('neural-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('send-btn').click();
-            }
-        });
+                    // Movement
+                    p.x += p.vx;
+                    p.y += p.vy;
 
-        // Node status animation
-        const nodes = ['overmind', 'archon', 'drone'];
-        
-        function animateNodes() {
-            nodes.forEach(node => {
-                const hex = document.getElementById(`${node}-hex`);
-                if (Math.random() > 0.8) {
-                    hex.classList.toggle('active');
-                    
-                    const statusElement = hex.querySelector('.node-status');
-                    if (hex.classList.contains('active')) {
-                        statusElement.textContent = node === 'drone' ? 'ACTIVE' : 'SYNCED';
-                    } else {
-                        statusElement.textContent = 'STANDBY';
+                    // Bounce
+                    if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+                    // Mouse Interaction
+                    if (this.mouse.x != null) {
+                        let dx = this.mouse.x - p.x;
+                        let dy = this.mouse.y - p.y;
+                        let distance = Math.sqrt(dx*dx + dy*dy);
+                        if (distance < CONFIG.mouseDist) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const force = (CONFIG.mouseDist - distance) / CONFIG.mouseDist;
+                            // Repel slightly
+                            const directionX = forceDirectionX * force * 0.5;
+                            const directionY = forceDirectionY * force * 0.5;
+                            p.x -= directionX;
+                            p.y -= directionY;
+                        }
+                    }
+
+                    // Draw Particle
+                    this.ctx.fillStyle = CONFIG.colors.primary;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Connect
+                    for (let j = i; j < this.particles.length; j++) {
+                        let p2 = this.particles[j];
+                        let dx = p.x - p2.x;
+                        let dy = p.y - p2.y;
+                        let distSq = dx*dx + dy*dy;
+                        
+                        if (distSq < CONFIG.connectionDist * CONFIG.connectionDist) {
+                            let alpha = 1 - (Math.sqrt(distSq) / CONFIG.connectionDist);
+                            this.ctx.strokeStyle = `rgba(0, 255, 204, ${alpha * 0.5})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.x, p.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
                     }
                 }
-            });
-            
-            setTimeout(animateNodes, 3000);
+                requestAnimationFrame(() => this.animate());
+            }
         }
+
+        // --- 3. DATA WAVE VISUALIZER ---
+        class WaveMonitor {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.data = new Array(50).fill(50);
+                this.resize();
+                this.loop();
+            }
+
+            resize() {
+                this.canvas.width = this.canvas.clientWidth;
+                this.canvas.height = this.canvas.clientHeight;
+            }
+
+            loop() {
+                // Simulate data input
+                if (Math.random() > 0.5) {
+                    const newVal = Math.max(10, Math.min(90, this.data[this.data.length-1] + (Math.random() - 0.5) * 20));
+                    this.data.push(newVal);
+                    this.data.shift();
+                }
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.strokeStyle = CONFIG.colors.primary;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+
+                const sliceWidth = this.canvas.width / (this.data.length - 1);
+                let x = 0;
+
+                this.ctx.moveTo(0, this.canvas.height / 2);
+                
+                // Smooth curve
+                for (let i = 0; i < this.data.length - 1; i++) {
+                    const y = (1 - this.data[i] / 100) * this.canvas.height;
+                    const nextY = (1 - this.data[i+1] / 100) * this.canvas.height;
+                    const nextX = x + sliceWidth;
+                    
+                    const xc = (x + nextX) / 2;
+                    const yc = (y + nextY) / 2;
+                    
+                    this.ctx.quadraticCurveTo(x, y, xc, yc);
+                    x = nextX;
+                }
+                
+                this.ctx.lineTo(this.canvas.width, (1 - this.data[this.data.length-1]/100) * this.canvas.height);
+                this.ctx.stroke();
+
+                // Gradient fill
+                this.ctx.lineTo(this.canvas.width, this.canvas.height);
+                this.ctx.lineTo(0, this.canvas.height);
+                this.ctx.fillStyle = "rgba(0, 255, 204, 0.1)";
+                this.ctx.fill();
+
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        // --- 4. MATRIX RAIN EFFECT ---
+        class MatrixEffect {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.isActive = false;
+                this.columns = [];
+                this.drops = [];
+                this.fontSize = 14;
+            }
+
+            trigger() {
+                if (this.isActive) return;
+                this.isActive = true;
+                this.canvas.style.opacity = 1;
+                this.resize();
+                
+                const cols = Math.floor(this.canvas.width / this.fontSize);
+                this.drops = new Array(cols).fill(1);
+                
+                this.animate();
+
+                // Auto stop after 5 seconds
+                setTimeout(() => {
+                    this.canvas.style.opacity = 0;
+                    setTimeout(() => { this.isActive = false; }, 500);
+                }, 5000);
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            animate() {
+                if (!this.isActive) return;
+
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.ctx.fillStyle = '#0F0';
+                this.ctx.font = this.fontSize + 'px monospace';
+
+                for (let i = 0; i < this.drops.length; i++) {
+                    const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                    this.ctx.fillText(text, i * this.fontSize, this.drops[i] * this.fontSize);
+
+                    if (this.drops[i] * this.fontSize > this.canvas.height && Math.random() > 0.975) {
+                        this.drops[i] = 0;
+                    }
+                    this.drops[i]++;
+                }
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // --- 5. TERMINAL & SYSTEM LOGIC ---
+        const audioSys = new AudioSubsystem();
+        const matrixFx = new MatrixEffect('matrix-canvas');
         
-        animateNodes();
+        // Placeholder Data Injection Helper
+        function updateStats() {
+            // Update CPU Ring
+            const cpuVal = parseInt(document.getElementById('cpu-val').innerText) || 0;
+            const ramVal = parseInt(document.getElementById('ram-val').innerText) || 0;
+            
+            // 251 is circumference of r=40
+            const cpuOffset = 251 - (251 * cpuVal / 100);
+            const ramOffset = 251 - (251 * ramVal / 100);
+            
+            document.getElementById('cpu-ring').style.strokeDashoffset = cpuOffset;
+            document.getElementById('ram-ring').style.strokeDashoffset = ramOffset;
+        }
+
+        // Terminal Logic
+        const termInput = document.getElementById('term-input');
+        const termOutput = document.getElementById('term-output');
+
+        function printLog(text, color = '#ccc') {
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.innerText = `> ${text}`;
+            termOutput.appendChild(line);
+            termOutput.scrollTop = termOutput.scrollHeight;
+        }
+
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = termInput.value.trim().toLowerCase();
+                audioSys.playBeep(1200, 'triangle');
+                printLog(termInput.value, '#00ffcc');
+                termInput.value = '';
+
+                switch (cmd) {
+                    case 'help':
+                        printLog("COMMANDS: status, matrix, clear, help", "#fff");
+                        printLog("Any other command will trigger Neural Link (Email).");
+                        break;
+                    case 'status':
+                        printLog("SYSTEM: ONLINE", "#0f0");
+                        printLog("HIVE CONNECTION: STABLE");
+                        printLog("THREAT LEVEL: LOW");
+                        break;
+                    case 'matrix':
+                        printLog("Initiating visuals...", "#0f0");
+                        matrixFx.trigger();
+                        break;
+                    case 'clear':
+                        termOutput.innerHTML = '';
+                        break;
+                    case '':
+                        break;
+                    default:
+                        printLog(`Transmitting neural packet: ${cmd}...`, "#ffff00");
+                        setTimeout(() => {
+                            window.location.href = `mailto:pulsareon@qq.com?subject=Neural Link Command&body=${cmd}`;
+                            printLog("Packet sent.", "#0f0");
+                        }, 1000);
+                }
+            } else {
+                // Typing sound
+                audioSys.playBeep(600 + Math.random()*200, 'sine');
+            }
+        });
+
+        // --- BOOT SEQUENCE ---
+        document.getElementById('boot-screen').addEventListener('click', function() {
+            // Initialize Audio Context (requires user gesture)
+            audioSys.init();
+            
+            // Fade out boot screen
+            this.style.opacity = 0;
+            setTimeout(() => {
+                this.style.display = 'none';
+                
+                // Initialize Visuals
+                new NeuralNetwork('bg-canvas');
+                new WaveMonitor('wave-canvas');
+                updateStats(); // Initial draw of rings
+                
+                // Focus terminal
+                termInput.focus();
+                document.addEventListener('click', () => termInput.focus()); // Always keep focus
+                
+            }, 1000);
+        });
+
     </script>
 </body>
 </html>
