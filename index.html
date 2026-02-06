@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+html_content = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -285,7 +286,7 @@
                 <div class="stat-label" data-i18n="stat_hive">HIVE NODES</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="network-throughput">1.4</div>
+                <div class="stat-value" id="network-throughput">4.0</div>
                 <div class="stat-label" data-i18n="stat_net">NETWORK MB/s</div>
             </div>
             <div class="stat-card">
@@ -325,14 +326,14 @@
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">25%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">51.6%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">51.8%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -397,6 +398,8 @@
                 <div>(c) Pulsareon Hive. All rights reserved.</div>
                 <br>
                 <div data-i18n="term_help">Type 'help' for available commands.</div>
+                <br>
+                <div>const logEntries = [{"time": "16:43:14", "level": "info", "message": "\ufeffalive"}];</div>
             </div>
             <div class="cmd-line">
                 <span class="prompt">root@pulsareon:~$</span>
@@ -863,13 +866,13 @@
                     case '':
                         break;
                     default:
-                        // Check for Admin Command (!)
+                        // Check for Admin Command (!)\
                         if (cmd.startsWith('!')) {
                             const adminCmd = cmd.substring(1).trim();
                             printLog(`AUTHENTICATING: ${adminCmd}...`, "#ff3333");
                             setTimeout(() => {
                                 const subject = encodeURIComponent("SIGNAL: Web Portal Interaction");
-                                const body = encodeURIComponent(`CMD: ${adminCmd}\\n\\nAuth Token: [Your-Token-Here]\\nTime: ${new Date().toISOString()}`);
+                                const body = encodeURIComponent(`CMD: ${adminCmd}\n\nAuth Token: [Your-Token-Here]\nTime: ${new Date().toISOString()}`);
                                 window.location.href = `mailto:pulsareon@qq.com?subject=${subject}&body=${body}`;
                                 printLog("Secure channel opened. Verify in mail client.", "#ffff00");
                             }, 1000);
@@ -914,6 +917,46 @@
             }
         });
 
+        // Log Data Placeholder
+        const logEntries = [{"time": "16:43:14", "level": "info", "message": "\ufeffalive"}];
+
+        // Log Stream
+        const logStream = document.getElementById('log-stream');
+        
+        let logIndex = 0;
+        
+        function addLogEntry() {
+            if (logEntries.length > 0) {
+                // Use real logs if available
+                if (logIndex < logEntries.length) {
+                    const entry = logEntries[logIndex];
+                    const logElement = document.createElement('div');
+                    logElement.className = 'log-entry';
+                    logElement.innerHTML = `
+                        <span class="log-time">[${entry.time}]</span>
+                        <span class="log-level-${entry.level}">${entry.level.toUpperCase()}</span>:
+                        ${entry.message}
+                    `;
+                    logStream.appendChild(logElement);
+                    logStream.scrollTop = logStream.scrollHeight;
+                    logIndex++;
+                    setTimeout(addLogEntry, Math.random() * 500 + 200); // Faster for real logs
+                }
+            } else {
+                // Fallback fake logs if empty
+                const entry = { time: new Date().toLocaleTimeString(), level: 'info', message: 'System Monitor Active' };
+                const logElement = document.createElement('div');
+                logElement.className = 'log-entry';
+                logElement.innerHTML = `
+                    <span class="log-time">[${entry.time}]</span>
+                    <span class="log-level-${entry.level}">${entry.level.toUpperCase()}</span>:
+                    ${entry.message}
+                `;
+                logStream.appendChild(logElement);
+                logStream.scrollTop = logStream.scrollHeight;
+            }
+        }
+
         // --- BOOT SEQUENCE ---
         document.getElementById('boot-screen').addEventListener('click', function() {
             // Initialize Audio Context (requires user gesture)
@@ -943,6 +986,9 @@
                     .catch(() => {
                         document.getElementById('page-views').innerText = "LIVE";
                     });
+                
+                // Start Logs
+                setTimeout(addLogEntry, 500);
                 
             }, 1000);
         });
