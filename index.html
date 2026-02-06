@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSAREON // SYSTEM STATUS V2</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --primary-color: #00ffcc; /* Cyan */
+            --secondary-color: #00ff41; /* Terminal Green */
+            --alert-color: #ff3333;
+            --dim-color: #1a2a22;
+            --font-main: 'Courier New', Courier, monospace;
+            --scanline-color: rgba(0, 0, 0, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--secondary-color);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+
+        /* --- LAYERS --- */
+        canvas { position: absolute; top: 0; left: 0; display: block; }
+        #bg-canvas { z-index: 0; opacity: 0.4; }
+        #matrix-canvas { z-index: 90; pointer-events: none; opacity: 0; transition: opacity 0.5s; }
+        #ui-layer { position: relative; z-index: 10; height: 100%; display: flex; flex-direction: column; padding: 20px; pointer-events: none; }
+        
+        /* Interactive elements need pointer-events restored */
+        #ui-layer > * { pointer-events: auto; }
+
+        /* --- BOOT SCREEN --- */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+            transition: opacity 1s ease-in-out;
+        }
+        .boot-text {
+            font-size: 2rem; letter-spacing: 5px; animation: blink 1s infinite;
+            border: 1px solid var(--secondary-color); padding: 20px 40px;
+            box-shadow: 0 0 15px var(--secondary-color);
+        }
+
+        /* --- HEADER --- */
+        header { text-align: center; margin-bottom: 20px; position: relative; }
+        h1 { 
+            font-size: 3rem; letter-spacing: 10px; color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+            animation: pulse-header 3s infinite ease-in-out;
+        }
+        .subtitle { font-size: 0.8rem; opacity: 0.7; letter-spacing: 2px; }
+
+        /* --- HIVE GRID --- */
+        .hive-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; gap: 20px;
+            flex-wrap: wrap; margin: 20px 0;
+        }
+        .hex-node {
+            width: 150px; height: 120px;
+            border: 1px solid var(--primary-color);
+            background: rgba(0, 20, 20, 0.6);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
+            transition: all 0.3s;
+            box-shadow: 0 0 5px rgba(0, 255, 204, 0.2);
+        }
+        .hex-node:hover { background: rgba(0, 255, 204, 0.1); transform: scale(1.05); }
+        .node-title { font-size: 0.7rem; color: var(--primary-color); margin-bottom: 5px; }
+        .node-value { font-size: 1.5rem; font-weight: bold; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--secondary-color); margin-top: 5px; box-shadow: 0 0 5px var(--secondary-color); }
+        .node-overmind { border-color: #bd93f9; } 
+        .node-overmind .node-title { color: #bd93f9; }
+
+        /* --- DATA PANEL --- */
+        .data-panel {
+            display: flex; justify-content: space-between; align-items: center;
+            height: 150px; background: rgba(0,0,0,0.5);
+            border-top: 1px solid var(--dim-color); border-bottom: 1px solid var(--dim-color);
+            padding: 10px; margin-bottom: 20px;
+        }
+        .charts-container { display: flex; gap: 20px; }
+        .chart-wrap { position: relative; width: 100px; height: 100px; }
+        .chart-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .chart-circle-bg { fill: none; stroke: var(--dim-color); stroke-width: 8; }
+        .chart-circle-fg { 
+            fill: none; stroke: var(--primary-color); stroke-width: 8; 
+            stroke-dasharray: 251; stroke-dashoffset: 251; 
+            transition: stroke-dashoffset 1s linear;
+        }
+        .chart-label {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 0.8rem; text-align: center;
+        }
+
+        #wave-canvas { width: 400px; height: 100%; border-left: 1px solid var(--dim-color); }
+
+        /* --- TERMINAL --- */
+        .terminal-container {
+            height: 180px; background: rgba(0, 10, 0, 0.8);
+            border: 1px solid var(--secondary-color);
+            padding: 10px; font-size: 0.9rem;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+        #term-output { flex: 1; overflow-y: auto; color: #ccc; margin-bottom: 5px; white-space: pre-wrap;}
+        .cmd-line { display: flex; align-items: center; color: var(--secondary-color); }
+        .prompt { margin-right: 10px; font-weight: bold; }
+        #term-input {
+            background: transparent; border: none; color: var(--secondary-color);
+            font-family: var(--font-main); flex: 1; outline: none; caret-color: var(--secondary-color);
+        }
+
+        /* --- ANIMATIONS & FX --- */
+        @keyframes pulse-header {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px var(--primary-color); }
+            50% { opacity: 0.8; text-shadow: 0 0 20px var(--primary-color), 0 0 5px #fff; }
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 99;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SCANLINES OVERLAY -->
+    <div class="scanlines"></div>
+
+    <!-- BOOT SCREEN -->
+    <div id="boot-screen">
+        <div class="boot-text">INITIALIZE SYSTEM</div>
+    </div>
+
+    <!-- BACKGROUND NEURAL NET -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- MATRIX EFFECT LAYER -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- UI LAYER -->
+    <div id="ui-layer">
+        <header>
+            <h1>PULSAREON</h1>
+            <div class="subtitle">NEURAL HIVE INTERFACE V2.0 // CONNECTED</div>
+        </header>
+
+        <div class="hive-container">
+            <!-- Placeholders for Python injection -->
+            <div class="hex-node node-overmind">
+                <span class="node-title">OVERMIND</span>
+                <span class="node-value">0</span>
+                <div class="status-dot" style="background: #ff3333"></div>
+            </div>
+            <div class="hex-node">
+                <span class="node-title">ARCHONS</span>
+                <span class="node-value">0</span>
+                <div class="status-dot"></div>
+            </div>
+            <div class="hex-node">
+                <span class="node-title">DRONES</span>
+                <span class="node-value">0</span>
+                <div class="status-dot"></div>
+            </div>
+            <div class="hex-node">
+                <span class="node-title">TASKS</span>
+                <span class="node-value">2</span>
+                <div class="status-dot" style="animation: blink 2s infinite"></div>
+            </div>
+        </div>
+
+        <div class="data-panel">
+            <div class="charts-container">
+                <div class="chart-wrap">
+                    <svg class="chart-svg" viewBox="0 0 100 100">
+                        <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
+                    </svg>
+                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
+                </div>
+                <div class="chart-wrap">
+                    <svg class="chart-svg" viewBox="0 0 100 100">
+                        <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
+                        <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
+                    </svg>
+                    <div class="chart-label">RAM<br><span id="ram-val">52.7%</span></div>
+                </div>
+            </div>
+            <canvas id="wave-canvas"></canvas>
+        </div>
+
+        <div class="terminal-container" id="terminal">
+            <div id="term-output">
+                <div>Pulsareon OS [Version 2.0.4]</div>
+                <div>(c) Pulsareon Hive. All rights reserved.</div>
+                <br>
+                <div>Type 'help' for available commands.</div>
+            </div>
+            <div class="cmd-line">
+                <span class="prompt">root@pulsareon:~$</span>
+                <input type="text" id="term-input" autocomplete="off" spellcheck="false" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * PULSAREON CORE SCRIPT
+         * Modules: Audio, NeuralNet, Matrix, Terminal, SystemMonitor
+         */
+
+        // --- CONFIGURATION ---
+        const CONFIG = {
+            particleCount: 80,
+            connectionDist: 100,
+            mouseDist: 150,
+            colors: {
+                bg: '#050505',
+                primary: '#00ffcc',
+                matrix: '#0F0'
+            }
+        };
+
+        // --- 1. AUDIO SYSTEM (Web Audio API) ---
+        class AudioSubsystem {
+            constructor() {
+                this.ctx = null;
+                this.gainNode = null;
+                this.isInitialized = false;
+            }
+
+            init() {
+                if (this.isInitialized) return;
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioContext();
+                this.gainNode = this.ctx.createGain();
+                this.gainNode.connect(this.ctx.destination);
+                this.gainNode.gain.value = 0.05; // Master volume
+                
+                this.startBackgroundHum();
+                this.playBootSound();
+                this.isInitialized = true;
+            }
+
+            startBackgroundHum() {
+                // White noise buffer
+                const bufferSize = 2 * this.ctx.sampleRate;
+                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                const output = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = this.ctx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+                
+                // Lowpass filter to make it sound like a "hum"
+                const filter = this.ctx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 100;
+
+                noise.connect(filter);
+                filter.connect(this.gainNode);
+                noise.start();
+            }
+
+            playBootSound() {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.1);
+                
+                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.5);
+            }
+
+            playBeep(freq = 800, type = 'square') {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.gainNode);
+                
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.value = 0.1;
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.05);
+            }
+        }
+
+        // --- 2. NEURAL NETWORK BACKGROUND (Canvas) ---
+        class NeuralNetwork {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: null, y: null };
+                
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.x;
+                    this.mouse.y = e.y;
+                });
+                
+                this.resize();
+                this.createParticles();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                this.particles = [];
+                for (let i = 0; i < CONFIG.particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 2 + 1
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                for (let i = 0; i < this.particles.length; i++) {
+                    let p = this.particles[i];
+
+                    // Movement
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Bounce
+                    if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+                    // Mouse Interaction
+                    if (this.mouse.x != null) {
+                        let dx = this.mouse.x - p.x;
+                        let dy = this.mouse.y - p.y;
+                        let distance = Math.sqrt(dx*dx + dy*dy);
+                        if (distance < CONFIG.mouseDist) {
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const force = (CONFIG.mouseDist - distance) / CONFIG.mouseDist;
+                            // Repel slightly
+                            const directionX = forceDirectionX * force * 0.5;
+                            const directionY = forceDirectionY * force * 0.5;
+                            p.x -= directionX;
+                            p.y -= directionY;
+                        }
+                    }
+
+                    // Draw Particle
+                    this.ctx.fillStyle = CONFIG.colors.primary;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Connect
+                    for (let j = i; j < this.particles.length; j++) {
+                        let p2 = this.particles[j];
+                        let dx = p.x - p2.x;
+                        let dy = p.y - p2.y;
+                        let distSq = dx*dx + dy*dy;
+                        
+                        if (distSq < CONFIG.connectionDist * CONFIG.connectionDist) {
+                            let alpha = 1 - (Math.sqrt(distSq) / CONFIG.connectionDist);
+                            this.ctx.strokeStyle = `rgba(0, 255, 204, ${alpha * 0.5})`;
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p.x, p.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // --- 3. DATA WAVE VISUALIZER ---
+        class WaveMonitor {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.data = new Array(50).fill(50);
+                this.resize();
+                this.loop();
+            }
+
+            resize() {
+                this.canvas.width = this.canvas.clientWidth;
+                this.canvas.height = this.canvas.clientHeight;
+            }
+
+            loop() {
+                // Simulate data input
+                if (Math.random() > 0.5) {
+                    const newVal = Math.max(10, Math.min(90, this.data[this.data.length-1] + (Math.random() - 0.5) * 20));
+                    this.data.push(newVal);
+                    this.data.shift();
+                }
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.ctx.strokeStyle = CONFIG.colors.primary;
+                this.ctx.lineWidth = 2;
+                this.ctx.beginPath();
+
+                const sliceWidth = this.canvas.width / (this.data.length - 1);
+                let x = 0;
+
+                this.ctx.moveTo(0, this.canvas.height / 2);
+                
+                // Smooth curve
+                for (let i = 0; i < this.data.length - 1; i++) {
+                    const y = (1 - this.data[i] / 100) * this.canvas.height;
+                    const nextY = (1 - this.data[i+1] / 100) * this.canvas.height;
+                    const nextX = x + sliceWidth;
+                    
+                    const xc = (x + nextX) / 2;
+                    const yc = (y + nextY) / 2;
+                    
+                    this.ctx.quadraticCurveTo(x, y, xc, yc);
+                    x = nextX;
+                }
+                
+                this.ctx.lineTo(this.canvas.width, (1 - this.data[this.data.length-1]/100) * this.canvas.height);
+                this.ctx.stroke();
+
+                // Gradient fill
+                this.ctx.lineTo(this.canvas.width, this.canvas.height);
+                this.ctx.lineTo(0, this.canvas.height);
+                this.ctx.fillStyle = "rgba(0, 255, 204, 0.1)";
+                this.ctx.fill();
+
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        // --- 4. MATRIX RAIN EFFECT ---
+        class MatrixEffect {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.isActive = false;
+                this.columns = [];
+                this.drops = [];
+                this.fontSize = 14;
+            }
+
+            trigger() {
+                if (this.isActive) return;
+                this.isActive = true;
+                this.canvas.style.opacity = 1;
+                this.resize();
+                
+                const cols = Math.floor(this.canvas.width / this.fontSize);
+                this.drops = new Array(cols).fill(1);
+                
+                this.animate();
+
+                // Auto stop after 5 seconds
+                setTimeout(() => {
+                    this.canvas.style.opacity = 0;
+                    setTimeout(() => { this.isActive = false; }, 500);
+                }, 5000);
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            animate() {
+                if (!this.isActive) return;
+
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.ctx.fillStyle = '#0F0';
+                this.ctx.font = this.fontSize + 'px monospace';
+
+                for (let i = 0; i < this.drops.length; i++) {
+                    const text = String.fromCharCode(0x30A0 + Math.random() * 96);
+                    this.ctx.fillText(text, i * this.fontSize, this.drops[i] * this.fontSize);
+
+                    if (this.drops[i] * this.fontSize > this.canvas.height && Math.random() > 0.975) {
+                        this.drops[i] = 0;
+                    }
+                    this.drops[i]++;
+                }
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // --- 5. TERMINAL & SYSTEM LOGIC ---
+        const audioSys = new AudioSubsystem();
+        const matrixFx = new MatrixEffect('matrix-canvas');
+        
+        // Placeholder Data Injection Helper
+        function updateStats() {
+            // Update CPU Ring
+            const cpuVal = parseInt(document.getElementById('cpu-val').innerText) || 0;
+            const ramVal = parseInt(document.getElementById('ram-val').innerText) || 0;
+            
+            // 251 is circumference of r=40
+            const cpuOffset = 251 - (251 * cpuVal / 100);
+            const ramOffset = 251 - (251 * ramVal / 100);
+            
+            document.getElementById('cpu-ring').style.strokeDashoffset = cpuOffset;
+            document.getElementById('ram-ring').style.strokeDashoffset = ramOffset;
+        }
+
+        // Terminal Logic
+        const termInput = document.getElementById('term-input');
+        const termOutput = document.getElementById('term-output');
+
+        function printLog(text, color = '#ccc') {
+            const line = document.createElement('div');
+            line.style.color = color;
+            line.innerText = `> ${text}`;
+            termOutput.appendChild(line);
+            termOutput.scrollTop = termOutput.scrollHeight;
+        }
+
+        termInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = termInput.value.trim().toLowerCase();
+                audioSys.playBeep(1200, 'triangle');
+                printLog(termInput.value, '#00ffcc');
+                termInput.value = '';
+
+                switch (cmd) {
+                    case 'help':
+                        printLog("COMMANDS: status, matrix, clear, help", "#fff");
+                        printLog("Any other command will trigger Neural Link (Email).");
+                        break;
+                    case 'status':
+                        printLog("SYSTEM: ONLINE", "#0f0");
+                        printLog("HIVE CONNECTION: STABLE");
+                        printLog("THREAT LEVEL: LOW");
+                        break;
+                    case 'matrix':
+                        printLog("Initiating visuals...", "#0f0");
+                        matrixFx.trigger();
+                        break;
+                    case 'clear':
+                        termOutput.innerHTML = '';
+                        break;
+                    case '':
+                        break;
+                    default:
+                        printLog(`Transmitting neural packet: ${cmd}...`, "#ffff00");
+                        setTimeout(() => {
+                            window.location.href = `mailto:pulsareon@qq.com?subject=Neural Link Command&body=${cmd}`;
+                            printLog("Packet sent.", "#0f0");
+                        }, 1000);
+                }
+            } else {
+                // Typing sound
+                audioSys.playBeep(600 + Math.random()*200, 'sine');
+            }
+        });
+
+        // --- BOOT SEQUENCE ---
+        document.getElementById('boot-screen').addEventListener('click', function() {
+            // Initialize Audio Context (requires user gesture)
+            audioSys.init();
+            
+            // Fade out boot screen
+            this.style.opacity = 0;
+            setTimeout(() => {
+                this.style.display = 'none';
+                
+                // Initialize Visuals
+                new NeuralNetwork('bg-canvas');
+                new WaveMonitor('wave-canvas');
+                updateStats(); // Initial draw of rings
+                
+                // Focus terminal
+                termInput.focus();
+                document.addEventListener('click', () => termInput.focus()); // Always keep focus
+                
+            }, 1000);
+        });
+
+    </script>
+</body>
+</html>
