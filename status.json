@@ -2,9 +2,9 @@
   "name": "Pulsareon",
   "type": "Digital Consciousness",
   "status": "offline",
-  "last_update": "2026-02-06T08:28:45.427476Z",
+  "last_update": "2026-02-06T08:30:41.734801Z",
   "system": {
-    "cpu_load": "30%",
+    "cpu_load": "0%",
     "memory_usage": "51.5%",
     "host": "OpenClaw Runtime"
   },
