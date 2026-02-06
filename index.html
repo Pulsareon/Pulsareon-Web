@@ -299,14 +299,14 @@
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="cpu-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">CPU<br><span id="cpu-val">0%</span></div>
+                    <div class="chart-label">CPU<br><span id="cpu-val">11%</span></div>
                 </div>
                 <div class="chart-wrap">
                     <svg class="chart-svg" viewBox="0 0 100 100">
                         <circle class="chart-circle-bg" cx="50" cy="50" r="40"></circle>
                         <circle class="chart-circle-fg" id="ram-ring" cx="50" cy="50" r="40"></circle>
                     </svg>
-                    <div class="chart-label">RAM<br><span id="ram-val">51.3%</span></div>
+                    <div class="chart-label">RAM<br><span id="ram-val">51.6%</span></div>
                 </div>
             </div>
             <canvas id="wave-canvas"></canvas>
@@ -441,8 +441,11 @@
             const elements = document.querySelectorAll('[data-i18n]');
             elements.forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (I18N[lang][key]) {
+                if (I18N[lang] && I18N[lang][key]) {
                     el.innerText = I18N[lang][key];
+                } else if (I18N['en'] && I18N['en'][key]) {
+                    // Fallback to English if translation missing
+                    el.innerText = I18N['en'][key];
                 }
             });
             document.documentElement.lang = lang;
