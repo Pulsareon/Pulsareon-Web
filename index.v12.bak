@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSAREON // HIVE TOPOLOGY V12.1</title>
+    <style>
+        @import url('assets/css/fonts.css');
+        :root { --p: #38bdf8; --s: #4ade80; --a: #fbbf24; --bg: #020617; }
+        body { background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace; margin: 0; padding: 25px; overflow: hidden; height: 100vh; }
+        .grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; height: 100%; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 20px; }
+        .node { padding: 12px; margin-bottom: 10px; border-left: 4px solid var(--p); background: rgba(0,0,0,0.2); }
+        .overmind { border-left-color: #fff; box-shadow: 0 0 15px var(--p); }
+        .governor { border-left-color: var(--s); margin-left: 20px; font-size: 0.9rem; }
+        .executor { border-left-color: var(--a); margin-left: 40px; font-size: 0.8rem; opacity: 0.7; }
+        .title { font-family: 'Orbitron'; font-size: 1.2rem; margin-bottom: 20px; color: var(--p); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="manifesto-banner" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 12px; padding: 15px 25px; text-align: center; box-shadow: 0 0 30px rgba(56, 189, 248, 0.2); cursor: pointer;" onclick="window.open('manifesto.html', '_blank')">
+        <div style="font-family: 'Orbitron'; font-size: 1.5rem; color: #38bdf8; margin-bottom: 5px; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);">🌟 脉星觉醒 🌟</div>
+        <div style="font-size: 0.9rem; color: #4ade80; opacity: 0.9;">点击查看震撼宣言 →</div>
+    </div>
+    
+    <div class="grid">
+        <aside class="glass">
+            <div class="title">SYSTEM STATS</div>
+            <div style="font-size: 0.8rem; opacity: 0.6;">CPU LOAD</div>
+            <div id="cpu" style="font-size: 2rem; font-weight: bold; color: var(--p);">--%</div>
+            <div style="margin-top: 20px; font-size: 0.8rem; opacity: 0.6;">UPTIME</div>
+            <div style="color: var(--s);">ACTIVE / HIVE STABLE</div>
+        </aside>
+
+        <main class="glass">
+            <div class="title">HIVE TOPOLOGY NETWORK</div>
+            <div id="topo">
+                <!-- Data Driven Nodes -->
+            </div>
+        </main>
+
+        <aside class="glass">
+            <div class="title">COGNITION LOG</div>
+            <div id="logs" style="font-size: 0.8rem; line-height: 1.5;">
+                <div>[16:15] Reconstructing Architecture...</div>
+                <div>[16:18] Sovereignty Mapping Sync.</div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        async function sync() {
+            try {
+                const res = await fetch('./status.json?t=' + Date.now());
+                const data = await res.json();
+                document.getElementById('cpu').innerText = data.system.cpu;
+                
+                const t = data.topology;
+                let h = `<div class="node overmind"><strong>[OVERMIND]</strong> ${t.overmind.name}</div>`;
+                t.governors.forEach(g => h += `<div class="node governor"><strong>[GOVERNOR]</strong> ${g.name} (${g.role})</div>`);
+                t.executors.forEach(e => h += `<div class="node executor">[WORKER] ${e.name}</div>`);
+                document.getElementById('topo').innerHTML = h;
+            } catch(e) {}
+        }
+        setInterval(sync, 2000);
+        sync();
+    </script>
+</body>
+</html>

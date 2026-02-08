@@ -1,0 +1,20 @@
+{
+  "last_update": 0.0,
+  "tasks": [
+    {
+      "name": "RFC 004: Pulsareon \u5168\u81ea\u52a8\u8fdb\u5316\u7ef4\u62a4\u7cfb\u7edf (Auto-Evolution System)",
+      "status": "Active",
+      "ref": "RFC_004_Auto_Evolution_System.md"
+    },
+    {
+      "name": "RFC 008: \u8109\u661f\u95e8\u6237\u6301\u7eed\u8fdb\u5316\u4e0e\u9636\u5c42\u5316\u4f5c\u4e1a (Continuous Web Evolution)",
+      "status": "Active",
+      "ref": "RFC_008_Continuous_Web_Evolution.md"
+    },
+    {
+      "name": "RFC 001: \u6062\u590d\u5f02\u6784\u90ae\u7bb1\u901a\u8baf\u670d\u52a1",
+      "status": "New",
+      "ref": "RFC_001_Restore_Email.md"
+    }
+  ]
+}

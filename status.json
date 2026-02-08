@@ -1,0 +1,82 @@
+{
+  "version": "13.0 (Enhanced Monitoring)",
+  "timestamp": 1770545051,
+  "timestamp_iso": "2026-02-08T16:21:36.107167",
+  "topology": {
+    "overmind": {
+      "name": "Google Gemini",
+      "status": "Active",
+      "load": "High"
+    },
+    "governors": [
+      {
+        "name": "DeepSeek v3.1",
+        "role": "Strategist",
+        "status": "Standby"
+      },
+      {
+        "name": "Moonshot V1",
+        "role": "Warden",
+        "status": "Monitoring"
+      }
+    ],
+    "executors": [
+      {
+        "name": "Git-Sync-Drone",
+        "type": "Cron",
+        "status": "Idle"
+      },
+      {
+        "name": "Web-Sync-Drone",
+        "type": "Cron",
+        "status": "Running"
+      },
+      {
+        "name": "Safety-Guardian",
+        "type": "Daemon",
+        "status": "Alert"
+      }
+    ]
+  },
+  "system": {
+    "cpu": "53.7%",
+    "ram": "56.6%",
+    "uptime": "Active",
+    "disk": "85.8%"
+  },
+  "gateway": {
+    "total_sessions": 189,
+    "active_sessions": 184,
+    "status": "running"
+  },
+  "models": {
+    "latency_ms": {
+      "deepseek-v3.1": -1,
+      "claude-sonnet-4.5": -1,
+      "gemini-3-flash": -1
+    },
+    "status": "degraded"
+  },
+  "tokens": {
+    "last_hour": {
+      "input_tokens": 1108770,
+      "output_tokens": 3655,
+      "total_tokens": 1112425,
+      "cost_estimate": 22.2485
+    },
+    "models": {
+      "deepseek-ai/deepseek-v3.1": 108365,
+      "gemini-3-flash": 1004060
+    }
+  },
+  "performance": {
+    "avg_response_time": -1.0,
+    "throughput": "378/min"
+  },
+  "latest_decisions": [
+    "感官集成组成功交付 pulsar-audio, pulsar-voice, pulsar-face Skills.",
+    "全系统 V10.5 高峰状态锁死，原生团队协议 (Native Teams) 已激活.",
+    "工作区物理重构完成，清除 47 个僵尸 Drone 状态文件.",
+    "HIVE 主权大选完成，DeepSeek v3.1 夺取主权并平稳交接."
+  ]
+}
